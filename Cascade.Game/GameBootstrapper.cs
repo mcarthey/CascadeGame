@@ -65,7 +65,7 @@ public class GameBootstrapper
         // Create root scene if needed
         if (_sceneSystem.SceneInstance == null)
         {
-            _sceneSystem.SceneInstance = new SceneInstance(new Scene());
+            _sceneSystem.SceneInstance = new SceneInstance(_services, new Scene());
         }
 
         var rootScene = _sceneSystem.SceneInstance.RootScene;

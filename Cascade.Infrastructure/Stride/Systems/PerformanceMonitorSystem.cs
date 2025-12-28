@@ -34,7 +34,7 @@ public class PerformanceMonitorSystem : SyncScript
 
         // Create a 1x1 pixel texture for drawing boxes
         _pixelTexture = Texture.New2D(GraphicsDevice, 1, 1, PixelFormat.R8G8B8A8_UNorm);
-        _pixelTexture.SetData(new[] { Color.White });
+        _pixelTexture.SetData(Game.GraphicsContext.CommandList, new[] { Color.White });
 
         // Try to load a default font - if not available, we'll skip text rendering
         try
@@ -64,7 +64,7 @@ public class PerformanceMonitorSystem : SyncScript
         // Render performance UI
         if (_spriteBatch == null || _pixelTexture == null) return;
 
-        _spriteBatch.Begin(GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
+        _spriteBatch.Begin(Game.GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
 
         // Draw semi-transparent background box
         _spriteBatch.Draw(_pixelTexture,

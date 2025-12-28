@@ -30,7 +30,7 @@ public class SimpleParticleRenderer : SyncScript
 
         // Create a 1x1 white pixel texture for drawing particles
         _pixelTexture = Texture.New2D(GraphicsDevice, 1, 1, PixelFormat.R8G8B8A8_UNorm);
-        _pixelTexture.SetData(new[] { Color.White });
+        _pixelTexture.SetData(Game.GraphicsContext.CommandList, new[] { Color.White });
     }
 
     public override void Update()
@@ -42,7 +42,7 @@ public class SimpleParticleRenderer : SyncScript
         if (particles.Count == 0) return;
 
         // Begin sprite batch
-        _spriteBatch.Begin(GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
+        _spriteBatch.Begin(Game.GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
 
         // Draw each particle as a small square
         foreach (var particle in particles)

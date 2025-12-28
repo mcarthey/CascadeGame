@@ -1,125 +1,156 @@
-# Elemental Underground - Fluid Physics Game
+# Cascade
 
-A 2D fluid physics game inspired by PixelJunk Shooter's particle-based fluid simulation, built with Stride Engine and clean SOLID architecture.
+A 2D physics-based action game featuring dynamic fluid simulation and underground exploration.
 
-## Project Structure
+## About
 
-```
-FluidGame.sln
-│
-├── FluidGame.Core/                    # Pure C# domain logic (no Stride dependencies)
-│   ├── Domain/
-│   │   ├── Particles/                 # Particle, Vector2, Color, ParticleType
-│   │   └── Physics/                   # SimplePhysicsEngine
-│   └── Application/
-│       └── Interfaces/                # IPhysicsEngine, IParticleSystem, Bounds
-│
-├── FluidGame.Infrastructure/          # Stride-specific implementations
-│   └── Stride/
-│       ├── Systems/                   # ParticlePhysicsSystem, PerformanceMonitorSystem
-│       └── Rendering/                 # SimpleParticleRenderer, TypeConverter
-│
-├── FluidGame.Game/                    # Stride game project
-│   ├── FluidGameApp.cs               # Main game class
-│   ├── GameBootstrapper.cs           # Dependency injection setup
-│   └── Program.cs                     # Entry point
-│
-└── FluidGame.Tests/                   # Unit tests
-    └── Core.Tests/                    # Tests for core domain (no Stride required!)
-```
+**Cascade** is an experimental game that combines the visceral fluid physics of PixelJunk Shooter with exploration-focused gameplay. Navigate through underground caverns filled with different types of liquids, each with unique properties and behaviors.
 
-## Architecture Principles
+The game uses a particle-based fluid simulation system where thousands of individual particles interact physically, creating emergent and unpredictable gameplay moments.
 
-### 1. **Dependency Inversion**
-- Core domain has **zero dependencies** on Stride or any framework
-- Infrastructure layer adapts Stride to our domain interfaces
-- High-level modules depend on abstractions, not concretions
+## Core Concept
 
-### 2. **Separation of Concerns**
-- **Core**: Pure business logic (physics, particles)
-- **Infrastructure**: Framework-specific implementations (rendering, systems)
-- **Game**: Composition root (bootstrapping, DI)
+You explore procedurally-generated underground environments where fluids cascade, pool, and interact:
 
-### 3. **Testability**
-- Core domain is 100% unit testable without game engine
-- See `FluidGame.Tests/Core.Tests/` for examples
+- **Water** - Flows naturally, can extinguish fire and cool lava
+- **Lava** - Burns obstacles, solidifies when cooled
+- **Oil** - Highly flammable, lighter than water
+- **Magnetic Ferrofluid** - Responds to electromagnetic fields
 
-## Current POC Status (Week 1-2)
+Each fluid type has distinct physical properties (density, viscosity, temperature) that create unique interaction opportunities.
 
-- ✅ Basic Stride project setup
-- ✅ Render 10,000 particles as colored points
-- ✅ Implement basic gravity simulation
-- ✅ FPS counter and performance monitoring
-- ✅ Clean architecture with SOLID principles
-- ✅ Unit tests for physics engine
+## Current Status
 
-## Building and Running
+Early development. The foundation is in place:
+
+- ✅ **10,000 particle simulation** running at 60 FPS
+- ✅ **Physics engine** with gravity and particle dynamics
+- ✅ **Clean architecture** allowing rapid iteration
+- 🚧 **Collision detection** (in progress)
+- 🚧 **Terrain generation** (planned)
+- 🚧 **Player controls** (planned)
+
+## Technology
+
+Built with:
+- **Stride Engine** (C# game engine)
+- **Particle-based physics** inspired by PixelJunk Shooter's GDC presentation
+- **Clean architecture** - testable, maintainable, framework-independent core
+
+## Building & Running
 
 ### Prerequisites
 - .NET 8.0 SDK
-- Stride Engine 4.2
+- Stride Engine 4.2+
 
-### Build
+### Quick Start
+
 ```bash
+# Clone and build
+git clone <repository-url>
+cd CascadeGame
 dotnet restore
 dotnet build
+
+# Run
+dotnet run --project Cascade.Game
 ```
 
-### Run Tests
-```bash
-dotnet test
+**Controls:**
+- ESC - Exit
+
+## Development Roadmap
+
+### Phase 1: Foundation (Current)
+- [x] Particle system architecture
+- [x] Basic physics simulation
+- [x] Rendering pipeline
+- [ ] Spatial optimization (grid-based)
+- [ ] Verlet integration
+
+### Phase 2: Fluids
+- [ ] Multiple fluid types (water, lava, oil)
+- [ ] Fluid-fluid interactions
+- [ ] Temperature simulation
+- [ ] State changes (water ↔ ice, lava ↔ rock)
+
+### Phase 3: Gameplay
+- [ ] Player character & controls
+- [ ] Terrain collision
+- [ ] Basic level design
+- [ ] Tools (drill, suction, etc.)
+
+### Phase 4: Polish
+- [ ] Procedural terrain generation
+- [ ] Particle effects & polish
+- [ ] Audio system
+- [ ] Save/load system
+
+## Architecture
+
+The game follows clean architecture principles:
+
+```
+Cascade/
+├── Cascade.Core/              # Pure C# - framework-independent
+│   ├── Domain/                # Particles, physics, game logic
+│   └── Application/           # Interfaces & use cases
+│
+├── Cascade.Infrastructure/    # Stride-specific implementations
+│   └── Stride/
+│       ├── Systems/           # Game loop integration
+│       └── Rendering/         # Graphics pipeline
+│
+├── Cascade.Game/              # Composition root
+│   └── Bootstrapper/          # Dependency injection
+│
+└── Cascade.Tests/             # Unit tests (no engine required)
 ```
 
-### Run Game
-```bash
-dotnet run --project FluidGame.Game
-```
+**Key principle**: Core game logic has zero dependencies on Stride, making it:
+- ✅ Unit testable without graphics
+- ✅ Portable to other engines
+- ✅ Fast to iterate on
 
-## Performance Target
+## Technical Details
 
-- **Current**: 10,000 particles
-- **Target**: 32,768 particles at 60 FPS (PixelJunk Shooter specs)
+### Particle System
+- **Particle count**: 10,000 (current) → 32,768 (target)
+- **Integration**: Euler (upgrading to Verlet)
+- **Spatial structure**: Grid-based hashing (planned)
+- **Collision**: Broad-phase optimization with distance fields
 
-## Controls
+### Performance Targets
+- **60 FPS** with 32,768 particles
+- **< 16ms** frame time
+- **< 200MB** memory footprint
 
-- **ESC**: Exit game
+## Inspiration
 
-## Technical Implementation
+**PixelJunk Shooter** (Q-Games, 2009)
+- Particle-based fluid simulation
+- Emergent gameplay from physical interactions
+- Multiple fluid types with distinct properties
 
-### Physics
-- Simple Euler integration (will upgrade to Verlet)
-- Gravity: 200 pixels/sec²
-- Boundary: Wrap-around (720p: 1280x720)
+GDC Presentation: ["Go With The Flow: Fluid Simulation" by Jaymin Kessler](https://www.gdcvault.com/play/1012447/Go-With-the-Flow-Fluid)
 
-### Rendering
-- SpriteBatch-based particle rendering (POC)
-- Future: Vertex buffers for better performance
+## Documentation
 
-### Particle Properties
-- Position (Vector2)
-- Velocity (Vector2)
-- Color (RGBA)
-- Type (Water, Lava, Goo, Ferrofluid - future)
-- Mass (future physics)
+- **[QUICKSTART.md](QUICKSTART.md)** - Get running in 5 minutes
+- **[SETUP.md](SETUP.md)** - Detailed setup & troubleshooting
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Design principles & patterns
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Technical details
 
-## Next Steps (Week 3-4)
+## Contributing
 
-1. Upgrade to Verlet integration
-2. Add particle-particle collision detection
-3. Implement spatial hashing/grid
-4. Optimize rendering with vertex buffers
-5. Add simple terrain/obstacles
+This is currently a solo development project and learning experiment. Contributions, suggestions, and feedback are welcome!
 
-## References
+## License
 
-- **PixelJunk Shooter GDC Talk**: "Go With The Flow: Fluid Simulation" by Jaymin Kessler
-- **Target Specs**: 32,768 particles, 44×28 grid, distance fields
-- **Architecture Discussion**: [Claude Conversation](https://claude.ai/share/879b4f59-6218-4f1e-a9ca-2ca718e9c186)
+TBD
 
-## Why Stride?
+---
 
-Stride was chosen over Unity specifically because:
-1. **Clean architecture support**: No MonoBehaviour coupling
-2. **Full C# access**: Real dependency injection, no magic
-3. **Open source**: Complete control over engine behavior
-4. **Performance**: Direct access to rendering pipeline
+**Why "Cascade"?**
+
+The name reflects both the cascading nature of fluids flowing through underground caverns and the cascading interactions between different game systems - where simple rules create complex, emergent behaviors.

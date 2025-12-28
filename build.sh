@@ -6,17 +6,17 @@ echo "================================================"
 
 # Restore packages
 echo "Restoring NuGet packages..."
-dotnet restore FluidGame.sln
+dotnet restore Cascade.sln
 
 # Build solution
 echo "Building solution..."
-dotnet build FluidGame.sln --configuration Release
+dotnet build Cascade.sln --configuration Release
 
 # Run tests
 echo "Running unit tests..."
-dotnet test FluidGame.Tests/FluidGame.Tests.csproj --configuration Release
+dotnet test Cascade.Tests/Cascade.Tests.csproj --configuration Release
 
 echo "================================================"
 echo "Build complete!"
-echo "To run the game: dotnet run --project FluidGame.Game"
+echo "To run the game: dotnet run --project Cascade.Game"
 echo "================================================"

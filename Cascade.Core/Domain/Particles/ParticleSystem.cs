@@ -58,11 +58,12 @@ public class ParticleSystem : IParticleSystem
             (_random.NextSingle() - 0.5f) * 20f
         );
 
-        // Random blue-ish color for water
+        // Bright cyan/white color for water - visible against blue background
+        // Higher values ensure contrast with cornflower blue (100, 149, 237)
         var color = new Color(
-            (byte)_random.Next(50, 100),
-            (byte)_random.Next(100, 200),
-            (byte)_random.Next(200, 255),
+            (byte)_random.Next(200, 255),  // High red for brightness
+            (byte)_random.Next(240, 255),  // High green
+            (byte)_random.Next(250, 255),  // High blue (near white)
             255
         );
 

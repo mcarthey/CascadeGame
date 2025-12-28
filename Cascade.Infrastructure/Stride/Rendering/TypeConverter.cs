@@ -1,6 +1,6 @@
 using Stride.Core.Mathematics;
-using DomainVector2 = FluidGame.Core.Domain.Particles.Vector2;
-using DomainColor = FluidGame.Core.Domain.Particles.Color;
+using DomainVector2 = Cascade.Core.Domain.Particles.Vector2;
+using DomainColor = Cascade.Core.Domain.Particles.Color;
 
 namespace Cascade.Infrastructure.Stride.Rendering;
 

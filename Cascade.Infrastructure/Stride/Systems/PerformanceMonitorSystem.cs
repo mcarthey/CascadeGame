@@ -50,6 +50,7 @@ public class PerformanceMonitorSystem : SyncScript
 
     public override void Update()
     {
+        // Update FPS counter
         _frameCount++;
         _fpsTimer += Game.UpdateTime.Elapsed.TotalSeconds;
 
@@ -59,10 +60,8 @@ public class PerformanceMonitorSystem : SyncScript
             _frameCount = 0;
             _fpsTimer = 0;
         }
-    }
 
-    public override void End()
-    {
+        // Render performance UI
         if (_spriteBatch == null || _pixelTexture == null) return;
 
         _spriteBatch.Begin(GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);

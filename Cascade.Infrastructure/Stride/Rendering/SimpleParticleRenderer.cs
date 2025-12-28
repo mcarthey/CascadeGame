@@ -35,12 +35,7 @@ public class SimpleParticleRenderer : SyncScript
 
     public override void Update()
     {
-        // Physics updates are handled by ParticlePhysicsSystem
-        // This script only renders
-    }
-
-    public override void End()
-    {
+        // Rendering happens here in SyncScript's Update method
         if (_spriteBatch == null || _pixelTexture == null) return;
 
         var particles = _particleSystem.Particles;

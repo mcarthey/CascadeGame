@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluidGame.Core\FluidGame.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Stride.Engine" Version="4.2.0.2175" />
+    <PackageReference Include="Stride.Core" Version="4.2.0.2175" />
+    <PackageReference Include="Stride.Graphics" Version="4.2.0.2175" />
+    <PackageReference Include="Stride.Physics" Version="4.2.0.2175" />
+  </ItemGroup>
+
+</Project>

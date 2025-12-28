@@ -4,8 +4,10 @@ using Cascade.Core.Domain.Physics;
 using Cascade.Infrastructure.Stride.Rendering;
 using Cascade.Infrastructure.Stride.Systems;
 using Stride.Core;
+using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.Games;
+using Stride.Graphics;
 
 namespace Cascade.Game;
 
@@ -73,6 +75,20 @@ public class GameBootstrapper
         // Add physics update system (GameSystem)
         var physicsSystem = new ParticlePhysicsSystem(_services, physicsEngine, particleSystem);
         _gameSystems.Add(physicsSystem);
+
+        // Create 2D orthographic camera
+        var cameraEntity = new Entity("Camera");
+        cameraEntity.Add(new CameraComponent
+        {
+            Projection = CameraProjectionMode.Orthographic,
+            OrthographicSize = 720f, // Match our vertical resolution
+            AspectRatio = 1280f / 720f,
+            NearClipPlane = -1000f,
+            FarClipPlane = 1000f,
+            Slot = _sceneSystem.GraphicsCompositor.Cameras[0].ToSlotId()
+        });
+        cameraEntity.Transform.Position = new Vector3(640f, 360f, 0f); // Center at 720p center
+        rootScene.Entities.Add(cameraEntity);
 
         // Create entity for rendering and monitoring (SyncScripts)
         var renderEntity = new Entity("ParticleRenderer");

@@ -40,8 +40,8 @@ Built with:
 ## Building & Running
 
 ### Prerequisites
-- .NET 8.0 SDK
-- Stride Engine 4.2+
+- .NET 10.0 SDK
+- Stride Engine 4.3+ (installed automatically via NuGet)
 
 ### Quick Start
 
@@ -52,7 +52,10 @@ cd CascadeGame
 dotnet restore
 dotnet build
 
-# Run
+# Run tests (should complete in < 1 second)
+dotnet test
+
+# Run the game
 dotnet run --project Cascade.Game
 ```
 
@@ -136,10 +139,8 @@ GDC Presentation: ["Go With The Flow: Fluid Simulation" by Jaymin Kessler](https
 
 ## Documentation
 
-- **[QUICKSTART.md](QUICKSTART.md)** - Get running in 5 minutes
-- **[SETUP.md](SETUP.md)** - Detailed setup & troubleshooting
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Design principles & patterns
-- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Technical details
+- **[DEVELOPER.md](DEVELOPER.md)** - Developer guide & troubleshooting
 
 ## Contributing
 

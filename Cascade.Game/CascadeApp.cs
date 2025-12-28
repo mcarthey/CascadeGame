@@ -1,3 +1,4 @@
+using Stride.CommunityToolkit.Engine;
 using Stride.Engine;
 using Stride.Games;
 
@@ -20,6 +21,9 @@ public class CascadeApp : Stride.Engine.Game
         GraphicsDeviceManager.PreferredBackBufferWidth = 1280;
         GraphicsDeviceManager.PreferredBackBufferHeight = 720;
         GraphicsDeviceManager.ApplyChanges();
+
+        // Set up 2D rendering pipeline (graphics compositor + camera)
+        this.SetupBase2D();
 
         // Bootstrap the game - register services and initialize systems
         var bootstrapper = new GameBootstrapper(Services, GameSystems, SceneSystem);

@@ -4,10 +4,9 @@ using Cascade.Core.Domain.Physics;
 using Cascade.Infrastructure.Stride.Rendering;
 using Cascade.Infrastructure.Stride.Systems;
 using Stride.Core;
-using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.Games;
-using Stride.Graphics;
+using Stride.Rendering.Compositing;
 
 namespace Cascade.Game;
 
@@ -50,7 +49,7 @@ public class GameBootstrapper
         _services.AddService<IParticleSystem>(particleSystem);
 
         // Create physics engine with gravity
-        var gravity = new Vector2(0, 200f); // 200 pixels/sec² downward
+        var gravity = new Cascade.Core.Domain.Particles.Vector2(0, 200f); // 200 pixels/sec² downward
         var bounds = new Bounds(0, 1280, 0, 720); // 720p resolution
         var physicsEngine = new SimplePhysicsEngine(gravity, bounds);
         _services.AddService<IPhysicsEngine>(physicsEngine);
@@ -64,37 +63,25 @@ public class GameBootstrapper
         var physicsEngine = _services.GetService<IPhysicsEngine>()
             ?? throw new InvalidOperationException("Physics engine not registered");
 
-        // Create root scene if needed
-        if (_sceneSystem.SceneInstance == null)
-        {
-            _sceneSystem.SceneInstance = new SceneInstance(_services, new Scene());
-        }
-
-        var rootScene = _sceneSystem.SceneInstance.RootScene;
+        // Get the root scene (created by SetupBase2D in CascadeApp)
+        var rootScene = _sceneSystem.SceneInstance?.RootScene
+            ?? throw new InvalidOperationException("Scene not initialized. Call SetupBase2D first.");
 
         // Add physics update system (GameSystem)
         var physicsSystem = new ParticlePhysicsSystem(_services, physicsEngine, particleSystem);
         _gameSystems.Add(physicsSystem);
 
-        // Create 2D orthographic camera
-        var cameraEntity = new Entity("Camera");
-        cameraEntity.Add(new CameraComponent
+        // Add particle renderer to the graphics compositor
+        var compositor = _sceneSystem.GraphicsCompositor;
+        if (compositor?.Game is SceneRendererCollection renderers)
         {
-            Projection = CameraProjectionMode.Orthographic,
-            OrthographicSize = 720f, // Match our vertical resolution
-            AspectRatio = 1280f / 720f,
-            NearClipPlane = -1000f,
-            FarClipPlane = 1000f,
-            Slot = _sceneSystem.GraphicsCompositor.Cameras[0].ToSlotId()
-        });
-        cameraEntity.Transform.Position = new Vector3(640f, 360f, 0f); // Center at 720p center
-        rootScene.Entities.Add(cameraEntity);
+            renderers.Add(new ParticleSceneRenderer(particleSystem));
+        }
 
-        // Create entity for rendering and monitoring (SyncScripts)
-        var renderEntity = new Entity("ParticleRenderer");
-        renderEntity.Add(new SimpleParticleRenderer(particleSystem));
-        renderEntity.Add(new PerformanceMonitorSystem(particleSystem));
-        rootScene.Entities.Add(renderEntity);
+        // Create entity for performance monitoring (SyncScript)
+        var monitorEntity = new Entity("PerformanceMonitor");
+        monitorEntity.Add(new PerformanceMonitorSystem(particleSystem));
+        rootScene.Entities.Add(monitorEntity);
     }
 
     private void InitializeParticles()

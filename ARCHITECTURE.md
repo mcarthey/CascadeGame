@@ -8,11 +8,11 @@ This project follows **Clean Architecture** principles (also known as Hexagonal 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    FluidGame.Game                        │
+│                    Cascade.Game                        │
 │              (Composition Root / Entry Point)            │
 │                                                          │
 │  - Program.cs (Main entry point)                        │
-│  - FluidGameApp.cs (Stride Game class)                  │
+│  - CascadeApp.cs (Stride Game class)                  │
 │  - GameBootstrapper.cs (DI container setup)             │
 └────────────────┬────────────────────────────────────────┘
                  │ depends on ↓
@@ -30,7 +30,7 @@ This project follows **Clean Architecture** principles (also known as Hexagonal 
 
 ## Layer Descriptions
 
-### 1. FluidGame.Core (Domain Layer)
+### 1. Cascade.Core (Domain Layer)
 
 **Purpose**: Contains pure business logic with zero external dependencies.
 
@@ -62,7 +62,7 @@ public class Particle
 }
 ```
 
-### 2. FluidGame.Infrastructure (Adapter Layer)
+### 2. Cascade.Infrastructure (Adapter Layer)
 
 **Purpose**: Adapts our domain to work with Stride Engine.
 
@@ -72,7 +72,7 @@ public class Particle
 - `Stride/Components/` - (Future: Stride EntityComponents)
 
 **Rules**:
-- ✅ Can reference: FluidGame.Core, Stride packages
+- ✅ Can reference: Cascade.Core, Stride packages
 - ✅ Should: Implement interfaces from Core
 - ✅ Should: Convert between domain types and Stride types
 - ❌ Should not: Contain business logic
@@ -100,13 +100,13 @@ public class ParticlePhysicsSystem : GameSystem
 }
 ```
 
-### 3. FluidGame.Game (Composition Root)
+### 3. Cascade.Game (Composition Root)
 
 **Purpose**: Wires everything together and starts the application.
 
 **Contents**:
 - `Program.cs` - Application entry point
-- `FluidGameApp.cs` - Stride Game subclass
+- `CascadeApp.cs` - Stride Game subclass
 - `GameBootstrapper.cs` - Dependency injection setup
 
 **Rules**:
@@ -126,7 +126,7 @@ var physicsSystem = new ParticlePhysicsSystem(services, physicsEngine, particleS
 gameSystems.Add(physicsSystem);
 ```
 
-### 4. FluidGame.Tests (Test Layer)
+### 4. Cascade.Tests (Test Layer)
 
 **Purpose**: Validates domain logic without requiring game engine.
 
@@ -134,7 +134,7 @@ gameSystems.Add(physicsSystem);
 - `Core.Tests/` - Unit tests for Core domain
 
 **Rules**:
-- ✅ Can reference: FluidGame.Core only (not Infrastructure!)
+- ✅ Can reference: Cascade.Core only (not Infrastructure!)
 - ✅ Should: Run without Stride runtime
 - ✅ Should: Be fast (no I/O, no graphics)
 - ✅ Framework: xUnit + FluentAssertions
@@ -379,7 +379,7 @@ public class ParticlePhysicsSystem : GameSystem
 
 ```csharp
 // BAD!
-using FluidGame.Infrastructure.Stride.Systems;
+using Cascade.Infrastructure.Stride.Systems;
 
 [Fact]
 public void TestPhysics()
@@ -388,7 +388,7 @@ public void TestPhysics()
 }
 
 // GOOD!
-using FluidGame.Core.Domain.Physics;
+using Cascade.Core.Domain.Physics;
 
 [Fact]
 public void TestPhysics()
@@ -420,7 +420,7 @@ To verify architecture is correct:
 
 ```bash
 # Core should have ZERO Stride references
-grep -r "using Stride" FluidGame.Core/
+grep -r "using Stride" Cascade.Core/
 # Should return nothing!
 
 # Tests should run without Stride

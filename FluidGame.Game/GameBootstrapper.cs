@@ -3,6 +3,7 @@ using FluidGame.Core.Domain.Particles;
 using FluidGame.Core.Domain.Physics;
 using FluidGame.Infrastructure.Stride.Rendering;
 using FluidGame.Infrastructure.Stride.Systems;
+using Stride.Core;
 using Stride.Engine;
 using Stride.Games;
 
@@ -16,11 +17,13 @@ public class GameBootstrapper
 {
     private readonly IServiceRegistry _services;
     private readonly GameSystemCollection _gameSystems;
+    private readonly SceneSystem _sceneSystem;
 
-    public GameBootstrapper(IServiceRegistry services, GameSystemCollection gameSystems)
+    public GameBootstrapper(IServiceRegistry services, GameSystemCollection gameSystems, SceneSystem sceneSystem)
     {
         _services = services ?? throw new ArgumentNullException(nameof(services));
         _gameSystems = gameSystems ?? throw new ArgumentNullException(nameof(gameSystems));
+        _sceneSystem = sceneSystem ?? throw new ArgumentNullException(nameof(sceneSystem));
     }
 
     /// <summary>
@@ -59,17 +62,23 @@ public class GameBootstrapper
         var physicsEngine = _services.GetService<IPhysicsEngine>()
             ?? throw new InvalidOperationException("Physics engine not registered");
 
-        // Register physics update system
+        // Create root scene if needed
+        if (_sceneSystem.SceneInstance == null)
+        {
+            _sceneSystem.SceneInstance = new SceneInstance(new Scene());
+        }
+
+        var rootScene = _sceneSystem.SceneInstance.RootScene;
+
+        // Add physics update system (GameSystem)
         var physicsSystem = new ParticlePhysicsSystem(_services, physicsEngine, particleSystem);
         _gameSystems.Add(physicsSystem);
 
-        // Register rendering system
-        var renderSystem = new SimpleParticleRenderer(_services, particleSystem);
-        _gameSystems.Add(renderSystem);
-
-        // Register performance monitor
-        var perfMonitor = new PerformanceMonitorSystem(_services, particleSystem);
-        _gameSystems.Add(perfMonitor);
+        // Create entity for rendering and monitoring (SyncScripts)
+        var renderEntity = new Entity("ParticleRenderer");
+        renderEntity.Add(new SimpleParticleRenderer(particleSystem));
+        renderEntity.Add(new PerformanceMonitorSystem(particleSystem));
+        rootScene.Entities.Add(renderEntity);
     }
 
     private void InitializeParticles()

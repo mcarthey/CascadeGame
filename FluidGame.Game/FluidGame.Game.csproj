@@ -14,11 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stride.Engine" Version="4.2.0.2175" />
-    <PackageReference Include="Stride.Core" Version="4.2.0.2175" />
-    <PackageReference Include="Stride.Graphics" Version="4.2.0.2175" />
-    <PackageReference Include="Stride.Physics" Version="4.2.0.2175" />
-    <PackageReference Include="Stride.UI" Version="4.2.0.2175" />
+    <PackageReference Include="Stride.Engine" Version="4.2.0.2188" />
+    <PackageReference Include="Stride.Core" Version="4.2.0.2188" />
+    <PackageReference Include="Stride.Graphics" Version="4.2.0.2188" />
+    <PackageReference Include="Stride.Physics" Version="4.2.0.2188" />
+    <PackageReference Include="Stride.UI" Version="4.2.0.2188" />
   </ItemGroup>
 
 </Project>

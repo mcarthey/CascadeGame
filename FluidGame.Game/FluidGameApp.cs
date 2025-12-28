@@ -1,4 +1,5 @@
 using Stride.Engine;
+using Stride.Games;
 
 namespace FluidGame.Game;
 
@@ -21,7 +22,7 @@ public class FluidGameApp : Stride.Engine.Game
         GraphicsDeviceManager.ApplyChanges();
 
         // Bootstrap the game - register services and initialize systems
-        var bootstrapper = new GameBootstrapper(Services, GameSystems);
+        var bootstrapper = new GameBootstrapper(Services, GameSystems, SceneSystem);
         bootstrapper.Bootstrap();
     }
 

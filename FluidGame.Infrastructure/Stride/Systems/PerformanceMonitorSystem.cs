@@ -1,48 +1,47 @@
 using FluidGame.Core.Application.Interfaces;
+using Stride.Core;
 using Stride.Engine;
+using Stride.Games;
 using Stride.Graphics;
 using Stride.Core.Mathematics;
-using Stride.Rendering;
+using Stride.Rendering.Sprites;
 
 namespace FluidGame.Infrastructure.Stride.Systems;
 
 /// <summary>
 /// Monitors and displays performance metrics (FPS, particle count).
+/// Uses SyncScript for rendering capabilities.
 /// </summary>
-public class PerformanceMonitorSystem : GameSystem
+public class PerformanceMonitorSystem : SyncScript
 {
     private readonly IParticleSystem _particleSystem;
     private SpriteBatch? _spriteBatch;
     private SpriteFont? _font;
-    private GraphicsDevice? _graphicsDevice;
+    private Texture? _pixelTexture;
 
     private double _fpsTimer;
     private int _frameCount;
     private int _currentFps;
 
-    public PerformanceMonitorSystem(IServiceRegistry services, IParticleSystem particleSystem)
-        : base(services)
+    public PerformanceMonitorSystem(IParticleSystem particleSystem)
     {
         _particleSystem = particleSystem ?? throw new ArgumentNullException(nameof(particleSystem));
-        Enabled = true;
-        DrawOrder = 10000; // Draw on top of everything
     }
 
-    public override void Initialize()
+    public override void Start()
     {
-        base.Initialize();
+        base.Start();
 
-        var graphicsDeviceService = Services.GetService<IGraphicsDeviceService>();
-        _graphicsDevice = graphicsDeviceService?.GraphicsDevice
-            ?? throw new InvalidOperationException("Graphics device not available");
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _spriteBatch = new SpriteBatch(_graphicsDevice);
+        // Create a 1x1 pixel texture for drawing boxes
+        _pixelTexture = Texture.New2D(GraphicsDevice, 1, 1, PixelFormat.R8G8B8A8_UNorm);
+        _pixelTexture.SetData(new[] { Color.White });
 
-        // Try to load a default font - if not available, we'll skip rendering
+        // Try to load a default font - if not available, we'll skip text rendering
         try
         {
-            var contentManager = Services.GetService<Stride.Core.Serialization.Contents.IContentManager>();
-            _font = contentManager?.Load<SpriteFont>("StrideDefaultFont");
+            _font = Content.Load<SpriteFont>("StrideDefaultFont");
         }
         catch
         {
@@ -51,10 +50,10 @@ public class PerformanceMonitorSystem : GameSystem
         }
     }
 
-    public override void Update(GameTime gameTime)
+    public override void Update()
     {
         _frameCount++;
-        _fpsTimer += gameTime.Elapsed.TotalSeconds;
+        _fpsTimer += Game.UpdateTime.Elapsed.TotalSeconds;
 
         if (_fpsTimer >= 1.0)
         {
@@ -64,52 +63,34 @@ public class PerformanceMonitorSystem : GameSystem
         }
     }
 
-    public override void Draw(RenderContext context)
+    public override void Draw()
     {
-        if (!Enabled || _spriteBatch == null || _graphicsDevice == null)
-            return;
+        if (_spriteBatch == null || _pixelTexture == null) return;
 
-        var commandList = context.CommandList;
+        _spriteBatch.Begin(GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
 
-        _spriteBatch.Begin(commandList, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
-
-        // Draw background box
-        DrawInfoBox(commandList);
+        // Draw semi-transparent background box
+        _spriteBatch.Draw(_pixelTexture,
+            new RectangleF(10, 10, 200, 80),
+            new Color(0, 0, 0, 180));
 
         // Draw performance text if font is available
         if (_font != null)
         {
-            DrawPerformanceText();
+            var text = $"FPS: {_currentFps}\n" +
+                       $"Particles: {_particleSystem.Count:N0}\n" +
+                       $"Target: 60 FPS";
+
+            _spriteBatch.DrawString(_font, text, new Vector2(20, 20), Color.White);
         }
 
         _spriteBatch.End();
     }
 
-    private void DrawInfoBox(CommandList commandList)
-    {
-        // Create a semi-transparent background for the text
-        var boxTexture = Texture.New2D(_graphicsDevice!, 1, 1, PixelFormat.R8G8B8A8_UNorm);
-        boxTexture.SetData(new[] { new Color(0, 0, 0, 180) });
-
-        _spriteBatch!.Draw(boxTexture, new RectangleF(10, 10, 200, 80), Color.White);
-
-        boxTexture.Dispose();
-    }
-
-    private void DrawPerformanceText()
-    {
-        if (_font == null) return;
-
-        var text = $"FPS: {_currentFps}\n" +
-                   $"Particles: {_particleSystem.Count:N0}\n" +
-                   $"Target: 60 FPS";
-
-        _spriteBatch!.DrawString(_font, text, new Vector2(20, 20), Color.White);
-    }
-
     protected override void Destroy()
     {
         _spriteBatch?.Dispose();
+        _pixelTexture?.Dispose();
         base.Destroy();
     }
 }

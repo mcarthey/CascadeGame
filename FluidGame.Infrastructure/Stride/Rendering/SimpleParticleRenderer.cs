@@ -1,8 +1,8 @@
 using FluidGame.Core.Application.Interfaces;
+using Stride.Core;
 using Stride.Engine;
 using Stride.Graphics;
 using Stride.Core.Mathematics;
-using Stride.Rendering;
 using Stride.Rendering.Sprites;
 
 namespace FluidGame.Infrastructure.Stride.Rendering;
@@ -10,49 +10,39 @@ namespace FluidGame.Infrastructure.Stride.Rendering;
 /// <summary>
 /// Simple particle renderer using SpriteBatch.
 /// Good for POC - will upgrade to vertex buffers for better performance.
+/// Uses SyncScript for rendering capabilities.
 /// </summary>
-public class SimpleParticleRenderer : GameSystem
+public class SimpleParticleRenderer : SyncScript
 {
     private readonly IParticleSystem _particleSystem;
     private SpriteBatch? _spriteBatch;
     private Texture? _pixelTexture;
-    private GraphicsDevice? _graphicsDevice;
 
-    public SimpleParticleRenderer(IServiceRegistry services, IParticleSystem particleSystem)
-        : base(services)
+    public SimpleParticleRenderer(IParticleSystem particleSystem)
     {
         _particleSystem = particleSystem ?? throw new ArgumentNullException(nameof(particleSystem));
-        Enabled = true;
-        DrawOrder = 100;
     }
 
-    public override void Initialize()
+    public override void Start()
     {
-        base.Initialize();
+        base.Start();
 
-        var graphicsDeviceService = Services.GetService<IGraphicsDeviceService>();
-        _graphicsDevice = graphicsDeviceService?.GraphicsDevice
-            ?? throw new InvalidOperationException("Graphics device not available");
-
-        _spriteBatch = new SpriteBatch(_graphicsDevice);
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // Create a 1x1 white pixel texture for drawing particles
-        _pixelTexture = Texture.New2D(_graphicsDevice, 1, 1, PixelFormat.R8G8B8A8_UNorm);
+        _pixelTexture = Texture.New2D(GraphicsDevice, 1, 1, PixelFormat.R8G8B8A8_UNorm);
         _pixelTexture.SetData(new[] { Color.White });
     }
 
-    public override void Draw(RenderContext context)
+    public override void Draw()
     {
-        if (!Enabled || _spriteBatch == null || _pixelTexture == null || _graphicsDevice == null)
-            return;
+        if (_spriteBatch == null || _pixelTexture == null) return;
 
         var particles = _particleSystem.Particles;
         if (particles.Count == 0) return;
 
-        var commandList = context.CommandList;
-
         // Begin sprite batch
-        _spriteBatch.Begin(commandList, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
+        _spriteBatch.Begin(GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
 
         // Draw each particle as a small square
         foreach (var particle in particles)

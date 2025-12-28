@@ -1,6 +1,8 @@
 using FluidGame.Core.Application.Interfaces;
 using FluidGame.Core.Domain.Particles;
+using Stride.Core;
 using Stride.Engine;
+using Stride.Games;
 
 namespace FluidGame.Infrastructure.Stride.Systems;
 

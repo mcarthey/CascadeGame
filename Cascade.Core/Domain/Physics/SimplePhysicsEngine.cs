@@ -80,11 +80,11 @@ namespace Cascade.Core.Domain.Physics
             Vector2 viscosityForce = Vector2.Zero;
             Vector2 cohesionForce = Vector2.Zero;
 
-            // Tuning for "Cornstarch" behavior (clumpy, sticky, not bouncy)
-            float targetDensity = 6.0f;       // Higher density for tighter packing
-            float pressureMultiplier = 3f;    // REDUCED: Less bouncing/repulsion
-            float viscosityStrength = 2.5f;   // INCREASED: More "stickiness" between particles
-            float cohesionStrength = 15f;     // NEW: Weak attraction at medium distances
+            // Use material properties for physics behavior
+            float targetDensity = p.Material?.RestDensity ?? 6.0f;
+            float pressureMultiplier = p.Material?.Stiffness ?? 3f;
+            float viscosityStrength = p.Material?.Viscosity ?? 2.5f;
+            float cohesionStrength = p.Material?.CohesionStrength ?? 15f;
 
             foreach (var neighbor in _grid.GetNeighbors(p.Position))
             {
@@ -135,15 +135,16 @@ namespace Cascade.Core.Domain.Physics
 
         private void ApplyBoundaryConstraints(Particle p)
         {
-            float bounce = 0.05f;   // Very low bounce for sticky snow
-            float friction = 0.75f; // Strong friction to help particles settle in piles
+            // Use material properties for boundary interaction
+            float bounce = p.Material?.Restitution ?? 0.05f;
+            float friction = p.Material?.Friction ?? 0.75f;
 
             // FLOOR (Bottom of screen)
             if (p.Position.Y > SimulationBounds.MaxY)
             {
                 p.Position = new Vector2(p.Position.X, SimulationBounds.MaxY);
 
-                // Kill vertical velocity and apply strong friction to horizontal
+                // Kill vertical velocity and apply friction to horizontal
                 p.Velocity = new Vector2(p.Velocity.X * friction, 0f);
                 return;
             }

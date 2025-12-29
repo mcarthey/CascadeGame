@@ -4,6 +4,8 @@ using Stride.Core.Mathematics;
 using Stride.Engine;
 using Stride.Graphics;
 using Stride.Rendering.Sprites;
+using CoreColor = Cascade.Core.Domain.Particles.Color;
+using StrideColor = Stride.Core.Mathematics.Color;
 
 namespace Cascade.Infrastructure.Stride.Scripts;
 
@@ -31,7 +33,7 @@ public class MaterialSelectionDisplay : SyncScript
 
         // Create a 1x1 pixel texture for drawing boxes
         _pixelTexture = Texture.New2D(GraphicsDevice, 1, 1, PixelFormat.R8G8B8A8_UNorm);
-        _pixelTexture.SetData(Game.GraphicsContext.CommandList, new[] { Color.White });
+        _pixelTexture.SetData(Game.GraphicsContext.CommandList, new[] { StrideColor.White });
 
         // Try to load a default font - if not available, we'll skip text rendering
         try
@@ -61,13 +63,13 @@ public class MaterialSelectionDisplay : SyncScript
         _spriteBatch.Begin(Game.GraphicsContext, SpriteSortMode.Deferred, BlendStates.AlphaBlend);
 
         // Draw material indicator box (top-left)
-        var materialColor = _currentMaterial.BaseColor;
-        var strideColor = new Color(materialColor.R, materialColor.G, materialColor.B, 255);
+        CoreColor materialColor = _currentMaterial.BaseColor;
+        var strideColor = new StrideColor(materialColor.R, materialColor.G, materialColor.B, 255);
 
         // Background for material display
         _spriteBatch.Draw(_pixelTexture,
             new RectangleF(220, 10, 250, 60),
-            new Color(0, 0, 0, 180));
+            new StrideColor(0, 0, 0, 180));
 
         // Material color indicator
         _spriteBatch.Draw(_pixelTexture,
@@ -78,11 +80,11 @@ public class MaterialSelectionDisplay : SyncScript
         if (_font != null)
         {
             var materialText = $"Material: {_currentMaterial.Name}";
-            _spriteBatch.DrawString(_font, materialText, new Vector2(280, 30), Color.White, 0, Vector2.Zero, new Vector2(1.2f, 1.2f), SpriteEffects.None, 0);
+            _spriteBatch.DrawString(_font, materialText, new Vector2(280, 30), StrideColor.White, 0, Vector2.Zero, new Vector2(1.2f, 1.2f), SpriteEffects.None, 0);
 
             // Draw controls help at bottom
             var controlsText = "1-8: Select Material | TAB: Cycle | LMB: Spray | RMB: Stream";
-            _spriteBatch.DrawString(_font, controlsText, new Vector2(20, 690), new Color(200, 200, 200, 200), 0, Vector2.Zero, new Vector2(0.8f, 0.8f), SpriteEffects.None, 0);
+            _spriteBatch.DrawString(_font, controlsText, new Vector2(20, 690), new StrideColor(200, 200, 200, 200), 0, Vector2.Zero, new Vector2(0.8f, 0.8f), SpriteEffects.None, 0);
         }
 
         _spriteBatch.End();

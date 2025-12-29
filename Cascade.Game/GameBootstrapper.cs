@@ -1,5 +1,6 @@
 using Cascade.Core.Application.Interfaces;
 using Cascade.Infrastructure.Stride.Systems;
+using Cascade.Infrastructure.Stride.Scripts;
 using Stride.Core;
 using Stride.Engine;
 using Stride.Games;
@@ -52,6 +53,11 @@ public class GameBootstrapper
             var monitorEntity = new Entity("PerformanceMonitor");
             monitorEntity.Add(new PerformanceMonitorSystem(particleSystem));
             _sceneSystem.SceneInstance.RootScene.Entities.Add(monitorEntity);
+
+            // Add material spray controller for testing
+            var sprayControllerEntity = new Entity("MaterialSprayController");
+            sprayControllerEntity.Add(new MaterialSprayController());
+            _sceneSystem.SceneInstance.RootScene.Entities.Add(sprayControllerEntity);
         }
     }
 }

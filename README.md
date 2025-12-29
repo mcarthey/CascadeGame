@@ -23,10 +23,13 @@ Each fluid type has distinct physical properties (density, viscosity, temperatur
 
 Early development. The foundation is in place:
 
-- ✅ **10,000 particle simulation** running at 60 FPS
-- ✅ **Physics engine** with gravity and particle dynamics
+- ✅ **SPH (Smoothed Particle Hydrodynamics)** physics simulation
+- ✅ **8 material types** with distinct physical properties (Snow, Water, Lava, Oil, Mud, Sand, Steam, Ice)
+- ✅ **Material spray system** for interactive testing ("flamethrower" style emitter)
+- ✅ **Spatial grid optimization** for efficient neighbor queries
 - ✅ **Clean architecture** allowing rapid iteration
-- 🚧 **Collision detection** (in progress)
+- ✅ **Comprehensive test coverage** (unit tests for all systems)
+- 🚧 **Terrain collision** (in progress)
 - 🚧 **Terrain generation** (planned)
 - 🚧 **Player controls** (planned)
 
@@ -60,22 +63,29 @@ dotnet run --project Cascade.Game
 ```
 
 **Controls:**
-- ESC - Exit
+- **ESC** - Exit game
+- **1-8** - Select material type (1=Snow, 2=Water, 3=Lava, 4=Oil, 5=Mud, 6=Sand, 7=Steam, 8=Ice)
+- **TAB** - Cycle through materials
+- **Left Mouse** - Spray burst (10 particles)
+- **Right Mouse (Hold)** - Continuous spray stream
 
 ## Development Roadmap
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation (✅ Complete)
 - [x] Particle system architecture
-- [x] Basic physics simulation
+- [x] SPH physics simulation (density, pressure, viscosity, cohesion)
 - [x] Rendering pipeline
-- [ ] Spatial optimization (grid-based)
-- [ ] Verlet integration
+- [x] Spatial optimization (grid-based hashing)
+- [x] Material type system with 8 distinct materials
+- [ ] Verlet integration upgrade
 
-### Phase 2: Fluids
-- [ ] Multiple fluid types (water, lava, oil)
-- [ ] Fluid-fluid interactions
-- [ ] Temperature simulation
-- [ ] State changes (water ↔ ice, lava ↔ rock)
+### Phase 2: Fluids (In Progress)
+- [x] Multiple fluid types (snow, water, lava, oil, mud, sand, steam, ice)
+- [x] Material-specific physics properties
+- [x] Interactive material emitter system
+- [ ] Fluid-fluid interactions (mixing, separation)
+- [ ] Temperature simulation & transfer
+- [ ] State changes (water ↔ ice ↔ steam, lava → rock)
 
 ### Phase 3: Gameplay
 - [ ] Player character & controls
@@ -139,8 +149,8 @@ GDC Presentation: ["Go With The Flow: Fluid Simulation" by Jaymin Kessler](https
 
 ## Documentation
 
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Design principles & patterns
 - **[DEVELOPER.md](DEVELOPER.md)** - Developer guide & troubleshooting
+- **[PHYSICS.md](PHYSICS.md)** - SPH physics implementation details
 
 ## Contributing
 

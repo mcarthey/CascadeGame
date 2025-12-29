@@ -27,6 +27,9 @@ public class CascadeApp : Stride.Engine.Game
         var particleSystem = new ParticleSystem();
         Services.AddService<IParticleSystem>(particleSystem);
 
+        var particleEmitter = new ParticleEmitter(particleSystem);
+        Services.AddService<IParticleEmitter>(particleEmitter);
+
         // 3. Setup Physics with System.Numerics.Vector2
         // Note: In your engine, MinY is the floor, so gravity should be negative 
         // to pull particles toward Y = 0.

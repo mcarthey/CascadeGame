@@ -2,6 +2,7 @@ using System.Numerics;
 using FluentAssertions;
 using Cascade.Core.Application.Interfaces;
 using Cascade.Core.Domain.Particles;
+using Cascade.Core.Domain.Particles.Materials;
 using Cascade.Core.Domain.Physics;
 using Xunit;
 
@@ -24,7 +25,7 @@ public class PhysicsEngineTests
         var particle = new Particle(
             position: new Vector2(500, 500),
             velocity: Vector2.Zero,
-            color: Color.Blue
+            material: new WaterMaterial()
         );
 
         var particles = new List<Particle> { particle };
@@ -49,7 +50,7 @@ public class PhysicsEngineTests
         var particle = new Particle(
             position: new Vector2(500, 100),
             velocity: Vector2.Zero,
-            color: Color.Blue
+            material: new WaterMaterial()
         );
 
         var particles = new List<Particle> { particle };
@@ -82,7 +83,7 @@ public class PhysicsEngineTests
         var particle = new Particle(
             position: new Vector2(999, 500),
             velocity: new Vector2(100, 0), // Moving right fast
-            color: Color.Blue
+            material: new WaterMaterial()
         );
 
         var particles = new List<Particle> { particle };
@@ -105,9 +106,9 @@ public class PhysicsEngineTests
 
         var particles = new List<Particle>
         {
-            new(new Vector2(100, 100), Vector2.Zero, Color.Red),
-            new(new Vector2(200, 200), Vector2.Zero, Color.Green),
-            new(new Vector2(300, 300), Vector2.Zero, Color.Blue)
+            new(new Vector2(100, 100), Vector2.Zero, new WaterMaterial()),
+            new(new Vector2(200, 200), Vector2.Zero, new WaterMaterial()),
+            new(new Vector2(300, 300), Vector2.Zero, new WaterMaterial())
         };
 
         float deltaTime = 0.1f;

@@ -2,6 +2,7 @@ using System.Numerics;
 using FluentAssertions;
 using Cascade.Core.Application.Interfaces;
 using Cascade.Core.Domain.Particles;
+using Cascade.Core.Domain.Particles.Materials;
 using Xunit;
 
 namespace Cascade.Tests.Core.Tests;
@@ -49,7 +50,7 @@ public class ParticleSystemTests
     {
         // Arrange
         var system = new ParticleSystem();
-        var particle = new Particle(Vector2.Zero, Vector2.Zero, Color.Blue);
+        var particle = new Particle(Vector2.Zero, Vector2.Zero, new WaterMaterial());
 
         // Act
         system.AddParticle(particle);

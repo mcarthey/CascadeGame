@@ -9,7 +9,7 @@ public class SteamMaterial : MaterialType
     public override Color BaseColor => Color.FromFloat(0.95f, 0.95f, 1.0f, 0.7f); // Translucent white
 
     // Visual properties - small wispy puffs
-    public override float ParticleSize => 15.0f;      // Large puffs of steam
+    public override float ParticleSize => 9.0f;       // Large puffs of steam
     public override float SizeVariation => 0.5f;      // Very varied (wispy)
 
     // Physics - VERY light, rises up, disperses

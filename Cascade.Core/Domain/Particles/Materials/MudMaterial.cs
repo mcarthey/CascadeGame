@@ -9,7 +9,7 @@ public class MudMaterial : MaterialType
     public override Color BaseColor => Color.FromFloat(0.4f, 0.3f, 0.2f); // Brown
 
     // Visual properties - chunky globs
-    public override float ParticleSize => 14.0f;      // Chunky globs
+    public override float ParticleSize => 8.0f;       // Chunky globs
     public override float SizeVariation => 0.3f;      // Varied globs
 
     // Physics - heavy, VERY slow, VERY sticky

@@ -9,7 +9,7 @@ public class IceMaterial : MaterialType
     public override Color BaseColor => Color.FromFloat(0.7f, 0.9f, 1.0f); // Light cyan
 
     // Visual properties - solid chunks
-    public override float ParticleSize => 13.0f;      // Medium-sized crystals
+    public override float ParticleSize => 8.0f;       // Medium-sized crystals
     public override float SizeVariation => 0.35f;     // Varied chunks
 
     // Physics - solid, bouncy, slides

@@ -82,8 +82,28 @@ public class MaterialSelectionDisplay : SyncScript
             var materialText = $"Material: {_currentMaterial.Name}";
             _spriteBatch.DrawString(_font, materialText, new Vector2(280, 25), StrideColor.White);
 
+            // Draw material key legend on the right side
+            var legendX = 1100f;
+            var legendY = 20f;
+            var lineHeight = 20f;
+
+            _spriteBatch.DrawString(_font, "Materials:", new Vector2(legendX, legendY), new StrideColor(220, 220, 220, 255));
+            legendY += lineHeight;
+
+            var materials = new[]
+            {
+                "1: Snow", "2: Water", "3: Lava", "4: Oil",
+                "5: Mud", "6: Sand", "7: Steam", "8: Ice"
+            };
+
+            foreach (var mat in materials)
+            {
+                _spriteBatch.DrawString(_font, mat, new Vector2(legendX, legendY), new StrideColor(180, 180, 180, 255));
+                legendY += lineHeight;
+            }
+
             // Draw controls help at bottom
-            var controlsText = "1-8: Select Material | TAB: Cycle | LMB: Spray | RMB: Stream";
+            var controlsText = "TAB: Cycle | LMB: Spray | RMB: Stream";
             _spriteBatch.DrawString(_font, controlsText, new Vector2(20, 690), new StrideColor(200, 200, 200, 200));
         }
 

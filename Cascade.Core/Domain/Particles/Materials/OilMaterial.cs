@@ -9,7 +9,7 @@ public class OilMaterial : MaterialType
     public override Color BaseColor => Color.FromFloat(0.15f, 0.1f, 0.05f); // Very dark brown/black
 
     // Visual properties - medium droplets
-    public override float ParticleSize => 11.0f;      // Medium droplets
+    public override float ParticleSize => 7.0f;       // Medium droplets
     public override float SizeVariation => 0.25f;     // Moderate variance
 
     // Physics - light, slippery, spreads out

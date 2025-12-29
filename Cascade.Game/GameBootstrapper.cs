@@ -54,6 +54,11 @@ public class GameBootstrapper
             monitorEntity.Add(new PerformanceMonitorSystem(particleSystem));
             _sceneSystem.SceneInstance.RootScene.Entities.Add(monitorEntity);
 
+            // Add material selection display (UI overlay)
+            var displayEntity = new Entity("MaterialSelectionDisplay");
+            displayEntity.Add(new MaterialSelectionDisplay());
+            _sceneSystem.SceneInstance.RootScene.Entities.Add(displayEntity);
+
             // Add material spray controller for testing
             var sprayControllerEntity = new Entity("MaterialSprayController");
             sprayControllerEntity.Add(new MaterialSprayController());

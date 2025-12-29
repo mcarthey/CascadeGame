@@ -31,10 +31,10 @@ public class CascadeApp : Stride.Engine.Game
         Services.AddService<IParticleEmitter>(particleEmitter);
 
         // 3. Setup Physics with System.Numerics.Vector2
-        // Note: In your engine, MinY is the floor, so gravity should be negative 
-        // to pull particles toward Y = 0.
+        // Bounds: Leave margin from screen edges so particles are visible when stacked
+        // In Stride's Y-down coordinate system: MinY=0 (top), MaxY=720 (bottom/floor)
         var gravity = new System.Numerics.Vector2(0, 400f);
-        var bounds = new Bounds(0, 1280, 0, 720);
+        var bounds = new Bounds(10, 1270, 10, 700);  // 10px margin on all sides
 
         var physicsEngine = new SimplePhysicsEngine(gravity, bounds);
         Services.AddService<IPhysicsEngine>(physicsEngine);

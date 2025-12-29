@@ -22,6 +22,7 @@ namespace Cascade.Infrastructure.Stride.Scripts;
 public class MaterialSprayController : SyncScript
 {
     private IParticleEmitter? _emitter;
+    private MaterialSelectionDisplay? _display;
     private MaterialType _selectedMaterial;
     private readonly Dictionary<Keys, MaterialType> _materialHotkeys;
     private int _currentMaterialIndex = 0;
@@ -67,6 +68,15 @@ public class MaterialSprayController : SyncScript
             throw new InvalidOperationException("IParticleEmitter service not registered");
         }
 
+        // Find the material selection display in the scene
+        var displayEntity = SceneSystem.SceneInstance?.RootScene?.Entities
+            .FirstOrDefault(e => e.Name == "MaterialSelectionDisplay");
+        if (displayEntity != null)
+        {
+            _display = displayEntity.Get<MaterialSelectionDisplay>();
+            _display?.UpdateMaterial(_selectedMaterial);
+        }
+
         System.Diagnostics.Debug.WriteLine($"[MaterialSprayController] Started - Selected material: {_selectedMaterial.Name}");
     }
 
@@ -83,12 +93,15 @@ public class MaterialSprayController : SyncScript
 
     private void HandleMaterialSelection()
     {
+        bool materialChanged = false;
+
         foreach (var kvp in _materialHotkeys)
         {
             if (Input.IsKeyPressed(kvp.Key))
             {
                 _selectedMaterial = kvp.Value;
                 _currentMaterialIndex = Array.IndexOf(_allMaterials, _selectedMaterial);
+                materialChanged = true;
                 System.Diagnostics.Debug.WriteLine($"[MaterialSprayController] Selected material: {_selectedMaterial.Name}");
             }
         }
@@ -98,7 +111,14 @@ public class MaterialSprayController : SyncScript
         {
             _currentMaterialIndex = (_currentMaterialIndex + 1) % _allMaterials.Length;
             _selectedMaterial = _allMaterials[_currentMaterialIndex];
+            materialChanged = true;
             System.Diagnostics.Debug.WriteLine($"[MaterialSprayController] Cycled to material: {_selectedMaterial.Name}");
+        }
+
+        // Update display when material changes
+        if (materialChanged && _display != null)
+        {
+            _display.UpdateMaterial(_selectedMaterial);
         }
     }
 

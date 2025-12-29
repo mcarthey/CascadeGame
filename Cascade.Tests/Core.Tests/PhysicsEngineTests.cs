@@ -1,3 +1,4 @@
+using System.Numerics;
 using FluentAssertions;
 using Cascade.Core.Application.Interfaces;
 using Cascade.Core.Domain.Particles;

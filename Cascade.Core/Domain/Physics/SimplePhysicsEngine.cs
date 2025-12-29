@@ -1,63 +1,161 @@
 using Cascade.Core.Application.Interfaces;
 using Cascade.Core.Domain.Particles;
+using System.Numerics;
 
-namespace Cascade.Core.Domain.Physics;
-
-/// <summary>
-/// Simple physics engine implementing basic Newtonian mechanics.
-/// This is a starting point - will evolve to Verlet integration and SPH (Smoothed Particle Hydrodynamics).
-/// </summary>
-public class SimplePhysicsEngine : IPhysicsEngine
+namespace Cascade.Core.Domain.Physics
 {
-    public Vector2 Gravity { get; set; }
-    public Bounds SimulationBounds { get; set; }
-
-    public SimplePhysicsEngine(Vector2 gravity, Bounds simulationBounds)
+    public class SimplePhysicsEngine : IPhysicsEngine
     {
-        Gravity = gravity;
-        SimulationBounds = simulationBounds;
-    }
+        public Vector2 Gravity { get; set; }
+        public Bounds SimulationBounds { get; set; }
+        private readonly SpatialGrid _grid;
+        private const float InteractionRadius = 15.0f;
+        private int _resetCount = 0;
 
-    /// <summary>
-    /// Updates particle physics using simple Euler integration.
-    /// Future: Upgrade to Verlet integration for better stability.
-    /// </summary>
-    public void Update(IList<Particle> particles, float deltaTime)
-    {
-        foreach (var particle in particles)
+        public SimplePhysicsEngine(Vector2 gravity, Bounds simulationBounds)
         {
-            UpdateParticle(particle, deltaTime);
+            Gravity = gravity;
+            SimulationBounds = simulationBounds;
+            _grid = new SpatialGrid(InteractionRadius);
         }
-    }
 
-    private void UpdateParticle(Particle particle, float deltaTime)
-    {
-        // Apply gravity force: F = ma, a = F/m
-        // For now, we ignore mass (assume m=1) for simplicity
-        Vector2 acceleration = Gravity;
+        public void Update(IList<Particle> particles, float deltaTime)
+        {
+            // 1. Stability: Don't allow massive timesteps if the game lags
+            float dt = MathF.Min(deltaTime, 0.0166f);
 
-        // Update velocity: v = v0 + a*dt
-        particle.Velocity += acceleration * deltaTime;
+            _grid.Update(particles);
 
-        // Update position: p = p0 + v*dt
-        particle.Position += particle.Velocity * deltaTime;
+            // 2. Density Pass
+            foreach (var p in particles)
+            {
+                p.Density = 0;
+                foreach (var neighbor in _grid.GetNeighbors(p.Position))
+                {
+                    float dist = Vector2.Distance(p.Position, neighbor.Position);
+                    if (dist < InteractionRadius)
+                    {
+                        float influence = 1.0f - (dist / InteractionRadius);
+                        p.Density += influence * influence;
+                    }
+                }
+                if (p.Density < 1.0f) p.Density = 1.0f;
+            }
 
-        // Apply boundary constraints (wrap around for now)
-        ApplyBoundaryConstraints(particle);
-    }
+            // 3. Force & Integration Pass
+            foreach (var p in particles)
+            {
+                Vector2 force = Gravity + CalculateSPHForces(p);
 
-    private void ApplyBoundaryConstraints(Particle particle)
-    {
-        // Wrap around horizontally
-        if (particle.Position.X < SimulationBounds.MinX)
-            particle.Position = new Vector2(SimulationBounds.MaxX, particle.Position.Y);
-        else if (particle.Position.X > SimulationBounds.MaxX)
-            particle.Position = new Vector2(SimulationBounds.MinX, particle.Position.Y);
+                p.Velocity += force * dt;
 
-        // Wrap around vertically
-        if (particle.Position.Y < SimulationBounds.MinY)
-            particle.Position = new Vector2(particle.Position.X, SimulationBounds.MaxY);
-        else if (particle.Position.Y > SimulationBounds.MaxY)
-            particle.Position = new Vector2(particle.Position.X, SimulationBounds.MinY);
+                // 4. Terminal Velocity: Prevents the "Static" jump effect
+                float speedSq = p.Velocity.LengthSquared();
+                float maxSpeed = 600f;
+                if (speedSq > maxSpeed * maxSpeed)
+                {
+                    p.Velocity = Vector2.Normalize(p.Velocity) * maxSpeed;
+                }
+
+                p.Position += p.Velocity * dt;
+
+                // 5. Bounds & Safety
+                if (!float.IsFinite(p.Position.X) || !float.IsFinite(p.Position.Y))
+                {
+                    _resetCount++;
+                    System.Diagnostics.Debug.WriteLine($"[SimplePhysicsEngine] Resetting particle #{_resetCount} due to non-finite position (X={p.Position.X}, Y={p.Position.Y})");
+                    ResetParticle(p);
+                }
+                ApplyBoundaryConstraints(p);
+            }
+        }
+
+        private Vector2 CalculateSPHForces(Particle p)
+        {
+            Vector2 pressureForce = Vector2.Zero;
+            Vector2 viscosityForce = Vector2.Zero;
+
+            // Tuning for "Stacking Snow" behavior
+            float targetDensity = 5.0f;       // INCREASED: Allows particles to pack tighter
+            float pressureMultiplier = 8f;    // Clamped lower to avoid huge forces
+            float viscosityStrength = 1.5f;   // INCREASED: Makes them "stick" together like wet snow
+
+            foreach (var neighbor in _grid.GetNeighbors(p.Position))
+            {
+                if (ReferenceEquals(p, neighbor)) continue;
+
+                float dist = Vector2.Distance(p.Position, neighbor.Position);
+                if (dist < InteractionRadius && dist > 0.1f)
+                {
+                    float influence = 1.0f - (dist / InteractionRadius);
+                    Vector2 dir = Vector2.Normalize(neighbor.Position - p.Position);
+
+                    // If density is below target, this force becomes attractive or neutral, 
+                    // preventing the sudden explosion when they touch.
+                    float sharedPressure = (p.Density + neighbor.Density - (2 * targetDensity)) * pressureMultiplier;
+                    pressureForce -= dir * sharedPressure * influence;
+
+                    viscosityForce += (neighbor.Velocity - p.Velocity) * influence * viscosityStrength;
+                }
+            }
+
+            var combined = pressureForce + viscosityForce;
+
+            // Defensive: avoid NaN/Infinity and clamp large forces that cause instability
+            if (!float.IsFinite(combined.X) || !float.IsFinite(combined.Y) || float.IsNaN(combined.X) || float.IsNaN(combined.Y))
+                return Vector2.Zero;
+
+            const float maxForce = 1000f;
+            if (combined.LengthSquared() > maxForce * maxForce)
+            {
+                combined = Vector2.Normalize(combined) * maxForce;
+            }
+
+            return combined;
+        }
+
+        private void ResetParticle(Particle p)
+        {
+            // Spawn at a random X at the TOP (MinY)
+            var random = new Random();
+            p.Position = new Vector2(random.Next((int)SimulationBounds.MinX, (int)SimulationBounds.MaxX), SimulationBounds.MinY + 10);
+            p.Velocity = Vector2.Zero;
+        }
+
+        private void ApplyBoundaryConstraints(Particle p)
+        {
+            float bounce = 0.1f;    // Low bounce for snow
+            float friction = 0.85f; // Friction to damp horizontal motion so they settle
+
+            // FLOOR (Bottom of screen)
+            if (p.Position.Y > SimulationBounds.MaxY)
+            {
+                p.Position = new Vector2(p.Position.X, SimulationBounds.MaxY);
+
+                // Zero vertical velocity and heavily damp horizontal to make them stick
+                p.Velocity = new Vector2(p.Velocity.X * friction, 0f);
+                return;
+            }
+
+            // CEILING (Top of screen)
+            if (p.Position.Y < SimulationBounds.MinY)
+            {
+                p.Position = new Vector2(p.Position.X, SimulationBounds.MinY);
+                p.Velocity = new Vector2(p.Velocity.X, p.Velocity.Y * -bounce);
+            }
+
+            // LEFT WALL
+            if (p.Position.X < SimulationBounds.MinX)
+            {
+                p.Position = new Vector2(SimulationBounds.MinX, p.Position.Y);
+                p.Velocity = new Vector2(p.Velocity.X * -bounce, p.Velocity.Y);
+            }
+            // RIGHT WALL
+            else if (p.Position.X > SimulationBounds.MaxX)
+            {
+                p.Position = new Vector2(SimulationBounds.MaxX, p.Position.Y);
+                p.Velocity = new Vector2(p.Velocity.X * -bounce, p.Velocity.Y);
+            }
+        }
     }
 }

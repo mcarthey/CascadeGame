@@ -1,11 +1,12 @@
+using System.Numerics;
 using FluentAssertions;
-using Cascade.Core.Domain.Particles;
 using Xunit;
 
 namespace Cascade.Tests.Core.Tests;
 
 /// <summary>
-/// Unit tests for Vector2 math operations.
+/// Unit tests for Vector2 math operations using System.Numerics.
+/// Verifies that our core math assumptions remain consistent after the library swap.
 /// </summary>
 public class Vector2Tests
 {
@@ -60,7 +61,8 @@ public class Vector2Tests
         var v = new Vector2(3, 4); // Classic 3-4-5 triangle
 
         // Act
-        var length = v.Length;
+        // Note: System.Numerics uses a method Length(), not a property
+        var length = v.Length();
 
         // Assert
         length.Should().BeApproximately(5f, 0.0001f);
@@ -73,10 +75,11 @@ public class Vector2Tests
         var v = new Vector2(3, 4);
 
         // Act
-        var normalized = v.Normalized();
+        // Note: System.Numerics uses static Vector2.Normalize
+        var normalized = Vector2.Normalize(v);
 
         // Assert
-        normalized.Length.Should().BeApproximately(1f, 0.0001f);
+        normalized.Length().Should().BeApproximately(1f, 0.0001f);
     }
 
     [Fact]

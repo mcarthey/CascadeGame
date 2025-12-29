@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Stride\Rendering\SimpleParticleRenderer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Cascade.Core\Cascade.Core.csproj" />
   </ItemGroup>
 

@@ -1,3 +1,4 @@
+using System.Numerics;
 using Cascade.Core.Application.Interfaces;
 
 namespace Cascade.Core.Domain.Particles;

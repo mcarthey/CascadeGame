@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "WebSearch",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "WebFetch(domain:doc.stride3d.net)",
+      "Bash(dotnet --list-sdks:*)",
+      "WebFetch(domain:stride3d.github.io)",
+      "Bash(dotnet add package:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet test:*)",
+      "Bash(git reset:*)",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}

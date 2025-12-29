@@ -49,7 +49,11 @@ namespace Cascade.Core.Domain.Physics
 
                 p.Velocity += force * dt;
 
-                // 4. Terminal Velocity: Prevents the "Static" jump effect
+                // 4. Global Damping: Helps particles settle into stable piles
+                // This mimics air resistance and internal friction
+                p.Velocity *= 0.992f; // Very slight damping per frame
+
+                // 5. Terminal Velocity: Prevents the "Static" jump effect
                 float speedSq = p.Velocity.LengthSquared();
                 float maxSpeed = 600f;
                 if (speedSq > maxSpeed * maxSpeed)
@@ -59,7 +63,7 @@ namespace Cascade.Core.Domain.Physics
 
                 p.Position += p.Velocity * dt;
 
-                // 5. Bounds & Safety
+                // 6. Bounds & Safety
                 if (!float.IsFinite(p.Position.X) || !float.IsFinite(p.Position.Y))
                 {
                     _resetCount++;
@@ -74,11 +78,13 @@ namespace Cascade.Core.Domain.Physics
         {
             Vector2 pressureForce = Vector2.Zero;
             Vector2 viscosityForce = Vector2.Zero;
+            Vector2 cohesionForce = Vector2.Zero;
 
-            // Tuning for "Stacking Snow" behavior
-            float targetDensity = 5.0f;       // INCREASED: Allows particles to pack tighter
-            float pressureMultiplier = 8f;    // Clamped lower to avoid huge forces
-            float viscosityStrength = 1.5f;   // INCREASED: Makes them "stick" together like wet snow
+            // Tuning for "Cornstarch" behavior (clumpy, sticky, not bouncy)
+            float targetDensity = 6.0f;       // Higher density for tighter packing
+            float pressureMultiplier = 3f;    // REDUCED: Less bouncing/repulsion
+            float viscosityStrength = 2.5f;   // INCREASED: More "stickiness" between particles
+            float cohesionStrength = 15f;     // NEW: Weak attraction at medium distances
 
             foreach (var neighbor in _grid.GetNeighbors(p.Position))
             {
@@ -90,22 +96,27 @@ namespace Cascade.Core.Domain.Physics
                     float influence = 1.0f - (dist / InteractionRadius);
                     Vector2 dir = Vector2.Normalize(neighbor.Position - p.Position);
 
-                    // If density is below target, this force becomes attractive or neutral, 
-                    // preventing the sudden explosion when they touch.
+                    // Pressure: Gentle repulsion when too crowded
                     float sharedPressure = (p.Density + neighbor.Density - (2 * targetDensity)) * pressureMultiplier;
                     pressureForce -= dir * sharedPressure * influence;
 
+                    // Viscosity: Makes particles move together (the "syrup" effect)
                     viscosityForce += (neighbor.Velocity - p.Velocity) * influence * viscosityStrength;
+
+                    // Cohesion: Weak attraction to nearby particles (cornstarch clumping)
+                    // Attraction is stronger at medium distances, weaker when very close
+                    float cohesionInfluence = influence * (1.0f - influence); // Peak at mid-distance
+                    cohesionForce += dir * cohesionInfluence * cohesionStrength;
                 }
             }
 
-            var combined = pressureForce + viscosityForce;
+            var combined = pressureForce + viscosityForce + cohesionForce;
 
             // Defensive: avoid NaN/Infinity and clamp large forces that cause instability
             if (!float.IsFinite(combined.X) || !float.IsFinite(combined.Y) || float.IsNaN(combined.X) || float.IsNaN(combined.Y))
                 return Vector2.Zero;
 
-            const float maxForce = 1000f;
+            const float maxForce = 1200f;
             if (combined.LengthSquared() > maxForce * maxForce)
             {
                 combined = Vector2.Normalize(combined) * maxForce;
@@ -124,15 +135,15 @@ namespace Cascade.Core.Domain.Physics
 
         private void ApplyBoundaryConstraints(Particle p)
         {
-            float bounce = 0.1f;    // Low bounce for snow
-            float friction = 0.85f; // Friction to damp horizontal motion so they settle
+            float bounce = 0.05f;   // Very low bounce for sticky snow
+            float friction = 0.75f; // Strong friction to help particles settle in piles
 
             // FLOOR (Bottom of screen)
             if (p.Position.Y > SimulationBounds.MaxY)
             {
                 p.Position = new Vector2(p.Position.X, SimulationBounds.MaxY);
 
-                // Zero vertical velocity and heavily damp horizontal to make them stick
+                // Kill vertical velocity and apply strong friction to horizontal
                 p.Velocity = new Vector2(p.Velocity.X * friction, 0f);
                 return;
             }

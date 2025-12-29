@@ -80,11 +80,11 @@ public class MaterialSelectionDisplay : SyncScript
         if (_font != null)
         {
             var materialText = $"Material: {_currentMaterial.Name}";
-            _spriteBatch.DrawString(_font, materialText, new Vector2(280, 30), StrideColor.White, 0, Vector2.Zero, new Vector2(1.2f, 1.2f), SpriteEffects.None, 0);
+            _spriteBatch.DrawString(_font, materialText, new Vector2(280, 25), StrideColor.White);
 
             // Draw controls help at bottom
             var controlsText = "1-8: Select Material | TAB: Cycle | LMB: Spray | RMB: Stream";
-            _spriteBatch.DrawString(_font, controlsText, new Vector2(20, 690), new StrideColor(200, 200, 200, 200), 0, Vector2.Zero, new Vector2(0.8f, 0.8f), SpriteEffects.None, 0);
+            _spriteBatch.DrawString(_font, controlsText, new Vector2(20, 690), new StrideColor(200, 200, 200, 200));
         }
 
         _spriteBatch.End();

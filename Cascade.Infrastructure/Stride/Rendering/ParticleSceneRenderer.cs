@@ -78,7 +78,8 @@ public class ParticleSceneRenderer : SceneRendererBase
             var position = TypeConverter.ToStrideVector2(particle.Position);
             var color = TypeConverter.ToStrideColor(particle.Color);
 
-            float displaySize = 12f;
+            // Use particle's render size for chunky, varied appearance
+            float displaySize = particle.RenderSize;
             float halfSize = displaySize / 2f;
 
             _spriteBatch.Draw(

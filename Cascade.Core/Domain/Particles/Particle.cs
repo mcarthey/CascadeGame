@@ -29,6 +29,11 @@ public class Particle
     public Color Color { get; set; }
 
     /// <summary>
+    /// Render size in pixels (varies per particle for visual variety)
+    /// </summary>
+    public float RenderSize { get; set; }
+
+    /// <summary>
     /// Material type that defines physical and visual properties.
     /// This determines how the particle behaves in the simulation.
     /// </summary>
@@ -54,6 +59,7 @@ public class Particle
         Velocity = velocity;
         Material = material ?? throw new ArgumentNullException(nameof(material));
         Color = material.GetParticleColor();
+        RenderSize = material.GetParticleSize();
         Density = 0f;
 #pragma warning disable CS0618 // Type or member is obsolete
         Type = ParticleType.Custom;
@@ -73,6 +79,7 @@ public class Particle
         Type = type;
 #pragma warning restore CS0618
         Material = GetDefaultMaterialForType(type);
+        RenderSize = Material.GetParticleSize();
         Density = 0f;
     }
 

@@ -40,9 +40,9 @@ public class CascadeApp : Stride.Engine.Game
         Services.AddService<IPhysicsEngine>(physicsEngine);
 
         // 4. Initialize particles
-        // Note: 10,000 particles is quite a lot for a first run! 
-        // Maybe start with 2,000 to verify the "snow" looks right, then scale up.
-        particleSystem.Initialize(2000, bounds);
+        // Start with ZERO particles - use the spray gun to add materials interactively!
+        // This lets you see each material type's unique behavior clearly
+        particleSystem.Initialize(0, bounds);
 
         // 5. Setup Rendering Pipeline
         this.Add2DGraphicsCompositor();

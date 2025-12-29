@@ -1,19 +1,24 @@
 namespace Cascade.Core.Domain.Particles.Materials;
 
 /// <summary>
-/// Oil: Light, floats on water, low friction, flammable
+/// Oil: Slippery, slides everywhere, forms puddles
 /// </summary>
 public class OilMaterial : MaterialType
 {
     public override string Name => "Oil";
-    public override Color BaseColor => Color.FromFloat(0.3f, 0.2f, 0.1f); // Dark brown
+    public override Color BaseColor => Color.FromFloat(0.15f, 0.1f, 0.05f); // Very dark brown/black
 
-    public override float Mass => 0.7f;           // Lighter than water
-    public override float Stiffness => 0.8f;      // Flows moderately
-    public override float Viscosity => 1.2f;      // Somewhat viscous
-    public override float Restitution => 0.05f;   // Little bounce
-    public override float Friction => 0.2f;       // Very slippery
+    // Visual properties - medium droplets
+    public override float ParticleSize => 11.0f;      // Medium droplets
+    public override float SizeVariation => 0.25f;     // Moderate variance
+
+    // Physics - light, slippery, spreads out
+    public override float Mass => 0.6f;           // Light (floats on water)
+    public override float Stiffness => 1.0f;      // Flows moderately
+    public override float Viscosity => 1.5f;      // Somewhat viscous (goopy)
+    public override float Restitution => 0.05f;   // No bounce
+    public override float Friction => 0.05f;      // EXTREMELY slippery
     public override float Temperature => 20.0f;   // Room temperature
-    public override float CohesionStrength => 8f; // Moderate cohesion
-    public override float RestDensity => 7.0f;    // Medium density
+    public override float CohesionStrength => 6f; // Forms puddles
+    public override float RestDensity => 6.0f;    // Medium density
 }

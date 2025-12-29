@@ -73,6 +73,17 @@ public abstract class MaterialType
     public virtual bool AffectedByGravity => true;
 
     /// <summary>
+    /// Base render size in pixels for particles of this material.
+    /// Larger = chunkier, more cartoon-like
+    /// </summary>
+    public virtual float ParticleSize => 12.0f;
+
+    /// <summary>
+    /// Random size variation as a multiplier (e.g., 0.3 = ±30% size variance)
+    /// </summary>
+    public virtual float SizeVariation => 0.2f;
+
+    /// <summary>
     /// Generate a color variant for a specific particle (adds randomness/variation)
     /// </summary>
     public virtual Color GetParticleColor()
@@ -87,5 +98,15 @@ public abstract class MaterialType
             (byte)Math.Clamp(BaseColor.B + random.Next(-variation, variation), 0, 255),
             BaseColor.A
         );
+    }
+
+    /// <summary>
+    /// Generate a random render size for a particle of this material
+    /// </summary>
+    public virtual float GetParticleSize()
+    {
+        var random = new Random();
+        float variation = SizeVariation * ParticleSize;
+        return ParticleSize + (float)(random.NextDouble() * 2 - 1) * variation;
     }
 }

@@ -8,8 +8,8 @@ public class SandMaterial : MaterialType
     public override string Name => "Sand";
     public override Color BaseColor => Color.FromFloat(0.9f, 0.8f, 0.5f); // Tan/beige
 
-    // Visual properties - tiny grains
-    public override float ParticleSize => 5.0f;       // Small grains
+    // Visual properties - visible grains
+    public override float ParticleSize => 7.0f;       // Visible grains
     public override float SizeVariation => 0.25f;     // Uniform size
 
     // Physics - pours freely, no stickiness

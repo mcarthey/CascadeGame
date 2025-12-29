@@ -8,8 +8,8 @@ public class SnowMaterial : MaterialType
     public override string Name => "Snow";
     public override Color BaseColor => Color.FromFloat(0.95f, 0.95f, 1.0f); // Pale blue-white
 
-    // Visual properties - CHUNKY large flakes
-    public override float ParticleSize => 10.0f;      // Large fluffy chunks
+    // Visual properties - Chunky satisfying blobs
+    public override float ParticleSize => 14.0f;      // Nice chunky flakes
     public override float SizeVariation => 0.4f;      // Lots of size variance
 
     // Physics - sticky, clumpy, slow-falling

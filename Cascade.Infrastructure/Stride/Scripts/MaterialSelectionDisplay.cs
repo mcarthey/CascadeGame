@@ -82,23 +82,34 @@ public class MaterialSelectionDisplay : SyncScript
             var materialText = $"Material: {_currentMaterial.Name}";
             _spriteBatch.DrawString(_font, materialText, new Vector2(280, 25), StrideColor.White);
 
-            // Draw material key legend on the right side
-            var legendX = 1100f;
-            var legendY = 20f;
-            var lineHeight = 20f;
+            // Draw material key legend on the right side with background
+            var legendX = 1050f;
+            var legendY = 10f;
+            var lineHeight = 22f;
 
-            _spriteBatch.DrawString(_font, "Materials:", new Vector2(legendX, legendY), new StrideColor(220, 220, 220, 255));
-            legendY += lineHeight;
+            // Background box for legend
+            _spriteBatch.Draw(_pixelTexture,
+                new RectangleF(legendX - 10, legendY, 220, 200),
+                new StrideColor(0, 0, 0, 200));
+
+            _spriteBatch.DrawString(_font, "MATERIALS", new Vector2(legendX, legendY + 5), new StrideColor(255, 255, 100, 255));
+            legendY += lineHeight + 5;
 
             var materials = new[]
             {
-                "1: Snow", "2: Water", "3: Lava", "4: Oil",
-                "5: Mud", "6: Sand", "7: Steam", "8: Ice"
+                ("1: Snow", new StrideColor(240, 240, 255, 255)),
+                ("2: Water", new StrideColor(100, 150, 255, 255)),
+                ("3: Lava", new StrideColor(255, 100, 20, 255)),
+                ("4: Oil", new StrideColor(80, 60, 30, 255)),
+                ("5: Mud", new StrideColor(150, 110, 80, 255)),
+                ("6: Sand", new StrideColor(230, 200, 130, 255)),
+                ("7: Steam", new StrideColor(240, 240, 240, 255)),
+                ("8: Ice", new StrideColor(180, 230, 255, 255))
             };
 
-            foreach (var mat in materials)
+            foreach (var (text, color) in materials)
             {
-                _spriteBatch.DrawString(_font, mat, new Vector2(legendX, legendY), new StrideColor(180, 180, 180, 255));
+                _spriteBatch.DrawString(_font, text, new Vector2(legendX, legendY), color);
                 legendY += lineHeight;
             }
 

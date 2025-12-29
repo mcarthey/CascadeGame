@@ -8,8 +8,8 @@ public class WaterMaterial : MaterialType
     public override string Name => "Water";
     public override Color BaseColor => Color.FromFloat(0.2f, 0.5f, 1.0f); // Bright blue
 
-    // Visual properties - small droplets
-    public override float ParticleSize => 6.0f;       // Small droplets
+    // Visual properties - satisfying droplets
+    public override float ParticleSize => 10.0f;      // Nice sized droplets
     public override float SizeVariation => 0.3f;      // Moderate variance
 
     // Physics - flows freely, bouncy

@@ -8,8 +8,8 @@ public class LavaMaterial : MaterialType
     public override string Name => "Lava";
     public override Color BaseColor => Color.FromFloat(1.0f, 0.35f, 0.05f); // Glowing orange-red
 
-    // Visual properties - big glowing globs
-    public override float ParticleSize => 9.0f;       // Large glowing globs
+    // Visual properties - big hefty globs
+    public override float ParticleSize => 13.0f;      // Big heavy globs
     public override float SizeVariation => 0.35f;     // Varied blob sizes
 
     // Physics - HEAVY, slow, sticky
